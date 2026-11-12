@@ -5,10 +5,12 @@ class WeatherCodeInfo {
   final String icon;
 }
 
-WeatherCodeInfo weatherCodeInfo(int code) {
-  if (code == 0) return const WeatherCodeInfo('Clear sky', '☀️');
+WeatherCodeInfo weatherCodeInfo(int code, {bool isDay = true}) {
+  if (code == 0) {
+    return WeatherCodeInfo('Clear sky', isDay ? '☀️' : '🌙');
+  }
   if (code == 1 || code == 2) {
-    return const WeatherCodeInfo('Partly cloudy', '⛅');
+    return WeatherCodeInfo('Partly cloudy', isDay ? '⛅' : '☁️');
   }
   if (code == 3) return const WeatherCodeInfo('Overcast', '☁️');
   if (code >= 45 && code <= 48) {
@@ -24,7 +26,7 @@ WeatherCodeInfo weatherCodeInfo(int code) {
     return const WeatherCodeInfo('Snow', '🌨️');
   }
   if (code >= 80 && code <= 82) {
-    return const WeatherCodeInfo('Rain showers', '🌦️');
+    return WeatherCodeInfo('Rain showers', isDay ? '🌦️' : '🌧️');
   }
   if (code == 85 || code == 86) {
     return const WeatherCodeInfo('Snow showers', '🌨️');
