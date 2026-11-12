@@ -12,6 +12,7 @@ extension ForecastResponseDtoMapper on ForecastResponseDto {
       latitude: latitude,
       longitude: longitude,
       timezone: timezone,
+      observedAt: DateTime.parse(current.time),
       temperature: current.temperature,
       apparentTemperature: current.apparentTemperature,
       relativeHumidity: current.relativeHumidity,

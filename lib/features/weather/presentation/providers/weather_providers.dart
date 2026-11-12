@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../../../core/network/dio_client.dart';
+import '../../data/location_service.dart';
 import '../../data/weather_remote_source.dart';
 import '../../data/weather_repository_impl.dart';
 import '../../domain/entities/weather.dart';
@@ -12,6 +14,14 @@ final weatherRemoteSourceProvider = Provider<WeatherRemoteSource>((ref) {
 
 final weatherRepositoryProvider = Provider<WeatherRepository>((ref) {
   return WeatherRepositoryImpl(ref.watch(weatherRemoteSourceProvider));
+});
+
+final locationServiceProvider = Provider<LocationService>((ref) {
+  return LocationService();
+});
+
+final currentLocationProvider = FutureProvider<Position>((ref) {
+  return ref.watch(locationServiceProvider).getCurrentPosition();
 });
 
 final weatherProvider =

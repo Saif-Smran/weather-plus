@@ -6,6 +6,7 @@ class Weather {
     required this.latitude,
     required this.longitude,
     required this.timezone,
+    required this.observedAt,
     required this.temperature,
     required this.apparentTemperature,
     required this.relativeHumidity,
@@ -18,6 +19,7 @@ class Weather {
   final double latitude;
   final double longitude;
   final String timezone;
+  final DateTime observedAt;
   final double temperature;
   final double apparentTemperature;
   final int relativeHumidity;

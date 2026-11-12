@@ -14,6 +14,7 @@ void main() {
     final weather = ForecastResponseDto.fromJson(json).toEntity();
 
     expect(weather.temperature, 27.1);
+    expect(weather.observedAt, DateTime.parse('2026-11-12T19:15'));
     expect(weather.hourly, hasLength(2));
     expect(weather.hourly[1].precipitationProbability, 10);
     expect(weather.daily, hasLength(2));
