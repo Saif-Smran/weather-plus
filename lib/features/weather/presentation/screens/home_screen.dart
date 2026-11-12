@@ -144,6 +144,10 @@ class _WeatherContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locationName = cityName ??
+        ref
+            .watch(locationNameProvider(coordinates))
+            .maybeWhen(data: (value) => value, orElse: () => null);
     final settings = ref.watch(settingsProvider);
     final weather = ref.watch(weatherProvider(coordinates));
 
@@ -170,6 +174,7 @@ class _WeatherContent extends StatelessWidget {
               CurrentWeatherHeader(
                 weather: weather,
                 temperatureUnit: settings.temperatureUnit,
+                cityName: locationName ?? 'Current location',
               ),
               Align(
                 alignment: Alignment.centerRight,
@@ -200,58 +205,81 @@ class _WeatherContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              StatsGrid(
-                stats: [
-                  (
-                    label: 'Humidity',
-                    value: '${weather.relativeHumidity}%',
-                    icon: Icons.water_drop_outlined,
-                  ),
-                  (
-                    label: 'Wind',
-                    value: formatWind(weather.windSpeed, settings.windUnit),
-                    icon: Icons.air,
-                  ),
-                  (
-                    label: 'UV index',
-                    value: today.uvIndex.toStringAsFixed(1),
-                    icon: Icons.wb_sunny_outlined,
-                  ),
-                  (
-                    label: 'Sunrise',
-                    value: DateFormat.jm().format(today.sunrise),
-                    icon: Icons.wb_twilight,
-                  ),
-                  (
-                    label: 'Sunset',
-                    value: DateFormat.jm().format(today.sunset),
-                    icon: Icons.nightlight_outlined,
-                  ),
-                  (
-                    label: 'Updated',
-                    value: DateFormat.jm().format(weather.observedAt),
-                    icon: Icons.update,
-                  ),
-                ],
+              _SectionCard(
+                title: 'Today at a glance',
+                child: StatsGrid(
+                  stats: [
+                    (
+                      label: 'Humidity',
+                      value: '${weather.relativeHumidity}%',
+                      icon: Icons.water_drop_outlined,
+                    ),
+                    (
+                      label: 'Wind',
+                      value: formatWind(weather.windSpeed, settings.windUnit),
+                      icon: Icons.air,
+                    ),
+                    (
+                      label: 'UV index',
+                      value: today.uvIndex.toStringAsFixed(1),
+                      icon: Icons.wb_sunny_outlined,
+                    ),
+                    (
+                      label: 'Sunrise',
+                      value: DateFormat.jm().format(today.sunrise),
+                      icon: Icons.wb_twilight,
+                    ),
+                    (
+                      label: 'Sunset',
+                      value: DateFormat.jm().format(today.sunset),
+                      icon: Icons.nightlight_outlined,
+                    ),
+                    (
+                      label: 'Updated',
+                      value: DateFormat.jm().format(weather.observedAt),
+                      icon: Icons.update,
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Next 24 hours',
-                style: Theme.of(context).textTheme.titleLarge,
+              _SectionCard(
+                title: 'Next 24 hours',
+                child: HourlyForecastList(forecasts: weather.hourly),
               ),
-              const SizedBox(height: 8),
-              HourlyForecastList(forecasts: weather.hourly),
               const SizedBox(height: 24),
-              Text(
-                '7-day forecast',
-                style: Theme.of(context).textTheme.titleLarge,
+              _SectionCard(
+                title: '7-day forecast',
+                child: DailyForecastList(forecasts: weather.daily),
               ),
-              const SizedBox(height: 8),
-              DailyForecastList(forecasts: weather.daily),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
     );
   }
 }

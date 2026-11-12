@@ -14,6 +14,17 @@ abstract final class AppTheme {
         seedColor: AppColors.seed,
         brightness: brightness,
       ),
+      scaffoldBackgroundColor: brightness == Brightness.light
+          ? const Color(0xFFF4F7FB)
+          : const Color(0xFF0D1726),
+      appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+      ),
       useMaterial3: true,
     );
   }
