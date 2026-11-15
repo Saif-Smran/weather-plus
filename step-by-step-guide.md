@@ -353,31 +353,31 @@ Rules for yourself:
 
 ---
 
-## Stretch (only after Step 17)
+## Stretch (Completed)
 
-- **Rain alert notifications:** https://pub.dev/packages/flutter_local_notifications and https://pub.dev/packages/workmanager
-- **Home screen widget:** https://pub.dev/packages/home_widget
-- **Bengali localization:** https://docs.flutter.dev/ui/accessibility-and-localization/internationalization
+- [x] **Rain alert notifications:** `flutter_local_notifications` integrated with automatic rain detection and notification permission controls.
+- [x] **Home screen widget:** `home_widget` integrated with native Android AppWidget layout, provider, and automatic updates.
+- [x] **Bengali localization:** Full bilingual support (English / বাংলা) with in-app language switching, weather condition translations, and Bengali numerals.
 
 ---
 
 ## Checklist
 
-- [ ] Step 0 Environment
-- [ ] Step 1 Project and skeleton
-- [ ] Step 2 Core setup
-- [ ] Step 3 Networking
-- [ ] Step 4 Models
-- [ ] Step 5 Repository and providers
-- [ ] Step 6 Home UI
-- [ ] Step 7 Location
-- [ ] Step 8 Hourly and daily
-- [ ] Step 9 City search
-- [ ] Step 10 Saved cities
-- [ ] Step 11 Settings
-- [ ] Step 12 Offline cache
-- [ ] Step 13 Air quality
-- [ ] Step 14 Charts
-- [ ] Step 15 Testing
-- [ ] Step 16 Polish
-- [ ] Step 17 Ship
+- [x] Step 0 Environment
+- [x] Step 1 Project and skeleton
+- [x] Step 2 Core setup
+- [x] Step 3 Networking
+- [x] Step 4 Models
+- [x] Step 5 Repository and providers
+- [x] Step 6 Home UI
+- [x] Step 7 Location
+- [x] Step 8 Hourly and daily
+- [x] Step 9 City search
+- [x] Step 10 Saved cities
+- [x] Step 11 Settings
+- [x] Step 12 Offline cache
+- [x] Step 13 Air quality
+- [x] Step 14 Charts
+- [x] Step 15 Testing
+- [x] Step 16 Polish
+- [x] Step 17 Ship

@@ -15,21 +15,30 @@ class CurrentWeatherHeader extends StatelessWidget {
     required this.temperatureUnit,
     this.cityName,
     this.atmosphere,
+    this.isBengali = false,
   });
 
   final Weather weather;
   final TemperatureUnit temperatureUnit;
   final String? cityName;
   final WeatherAtmosphere? atmosphere;
+  final bool isBengali;
 
   @override
   Widget build(BuildContext context) {
     final isDay = atmosphere?.dayPhase.isDaytime ?? true;
-    final condition = weatherCodeInfo(weather.weatherCode, isDay: isDay);
+    final condition = weatherCodeInfo(
+      weather.weatherCode,
+      isDay: isDay,
+      isBengali: isBengali,
+    );
     final today = weather.daily.isNotEmpty ? weather.daily.first : null;
 
-    final formattedDate =
-        DateFormat('EEEE, MMM d • h:mm a').format(DateTime.now());
+    final cityTime = weather.currentLocalTime;
+    final formattedDate = DateFormat(
+      'EEEE, MMM d • h:mm a',
+      isBengali ? 'bn' : 'en',
+    ).format(cityTime);
 
     return GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
@@ -71,6 +80,32 @@ class CurrentWeatherHeader extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
+          if (weather.isFromCache) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0x33FFA726),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0x66FFA726)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.cloud_off, size: 12, color: Color(0xFFFFB74D)),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Offline cache (${DateFormat.jm().format(weather.observedAt)})',
+                    style: const TextStyle(
+                      color: Color(0xFFFFB74D),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: 20),
 
@@ -178,7 +213,9 @@ class CurrentWeatherHeader extends StatelessWidget {
                 ),
               ],
               Text(
-                'Feels like ${formatTemperature(weather.apparentTemperature, temperatureUnit)}',
+                isBengali
+                    ? 'অনুভূত হচ্ছে ${formatTemperature(weather.apparentTemperature, temperatureUnit)}'
+                    : 'Feels like ${formatTemperature(weather.apparentTemperature, temperatureUnit)}',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.9),
                   fontSize: 14,

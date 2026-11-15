@@ -11,11 +11,13 @@ class DailyForecastList extends StatelessWidget {
     required this.forecasts,
     this.currentTemperature,
     this.atmosphere,
+    this.isBengali = false,
   });
 
   final List<DailyForecast> forecasts;
   final double? currentTemperature;
   final WeatherAtmosphere? atmosphere;
+  final bool isBengali;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,10 @@ class DailyForecastList extends StatelessWidget {
                 SizedBox(
                   width: 58,
                   child: Text(
-                    index == 0 ? 'Today' : DateFormat('EEE').format(forecast.date),
+                    index == 0
+                        ? (isBengali ? 'আজ' : 'Today')
+                        : DateFormat('EEE', isBengali ? 'bn' : 'en')
+                            .format(forecast.date),
                     style: TextStyle(
                       color: index == 0
                           ? Colors.white

@@ -11,10 +11,12 @@ class HourlyForecastList extends StatelessWidget {
     super.key,
     required this.forecasts,
     this.atmosphere,
+    this.isBengali = false,
   });
 
   final List<HourlyForecast> forecasts;
   final WeatherAtmosphere? atmosphere;
+  final bool isBengali;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +33,15 @@ class HourlyForecastList extends StatelessWidget {
           final forecast = visibleForecasts[index];
           final isNow = index == 0;
           final isDayHour = forecast.time.hour >= 6 && forecast.time.hour < 18;
-          final condition = weatherCodeInfo(forecast.weatherCode, isDay: isDayHour);
+          final condition = weatherCodeInfo(
+            forecast.weatherCode,
+            isDay: isDayHour,
+            isBengali: isBengali,
+          );
 
-          final timeLabel = isNow ? 'Now' : DateFormat('ha').format(forecast.time);
+          final timeLabel = isNow
+              ? (isBengali ? 'এখন' : 'Now')
+              : DateFormat('ha', isBengali ? 'bn' : 'en').format(forecast.time);
 
           return GlassCard(
             borderRadius: 20,

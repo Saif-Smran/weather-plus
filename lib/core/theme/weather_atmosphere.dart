@@ -111,10 +111,10 @@ class WeatherAtmosphere {
       return WeatherAtmosphere._defaultDay();
     }
 
-    final now = DateTime.now();
+    final cityTime = weather.currentLocalTime;
     final today = weather.daily.isNotEmpty ? weather.daily.first : null;
     final dayPhase = resolveDayPhase(
-      time: now,
+      time: cityTime,
       sunrise: today?.sunrise,
       sunset: today?.sunset,
     );

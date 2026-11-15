@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/settings.dart';
 import '../providers/settings_provider.dart';
 
@@ -10,15 +11,55 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    final l10n = ref.watch(localizationsProvider);
     final notifier = ref.read(settingsProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
+          // Language selection
           _SettingsGroupCard(
-            title: 'Temperature Unit',
+            title: l10n.languageTitle,
+            icon: Icons.language,
+            child: SegmentedButton<AppLanguage>(
+              segments: const [
+                ButtonSegment(
+                  value: AppLanguage.english,
+                  label: Text('English'),
+                ),
+                ButtonSegment(
+                  value: AppLanguage.bengali,
+                  label: Text('বাংলা'),
+                ),
+              ],
+              selected: {settings.language},
+              onSelectionChanged: (selection) =>
+                  notifier.setLanguage(selection.first),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Rain alerts toggle
+          _SettingsGroupCard(
+            title: l10n.rainAlertsTitle,
+            icon: Icons.notifications_active_outlined,
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                l10n.rainAlertsSubtitle,
+                style: const TextStyle(fontSize: 13),
+              ),
+              value: settings.rainAlertsEnabled,
+              onChanged: (enabled) => notifier.setRainAlertsEnabled(enabled),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Temperature Unit
+          _SettingsGroupCard(
+            title: l10n.temperatureUnitTitle,
             icon: Icons.thermostat_outlined,
             child: SegmentedButton<TemperatureUnit>(
               segments: const [
@@ -39,8 +80,10 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+
+          // Wind Speed Unit
           _SettingsGroupCard(
-            title: 'Wind Speed Unit',
+            title: l10n.windSpeedUnitTitle,
             icon: Icons.air,
             child: SegmentedButton<WindUnit>(
               segments: const [
@@ -59,8 +102,10 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+
+          // Theme Preference
           _SettingsGroupCard(
-            title: 'Theme Preference',
+            title: l10n.themePreferenceTitle,
             icon: Icons.palette_outlined,
             child: SegmentedButton<ThemeMode>(
               segments: const [

@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/location_service.dart';
 import '../../data/reverse_geocoder.dart';
+import '../../data/weather_local_source.dart';
 import '../../data/weather_remote_source.dart';
 import '../../data/weather_repository_impl.dart';
 import '../../domain/entities/weather.dart';
@@ -14,7 +15,10 @@ final weatherRemoteSourceProvider = Provider<WeatherRemoteSource>((ref) {
 });
 
 final weatherRepositoryProvider = Provider<WeatherRepository>((ref) {
-  return WeatherRepositoryImpl(ref.watch(weatherRemoteSourceProvider));
+  return WeatherRepositoryImpl(
+    ref.watch(weatherRemoteSourceProvider),
+    ref.watch(weatherLocalSourceProvider),
+  );
 });
 
 final locationServiceProvider = Provider<LocationService>((ref) {

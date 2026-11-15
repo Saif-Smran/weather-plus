@@ -4,7 +4,7 @@ import '../../domain/entities/weather.dart';
 import 'forecast_response_dto.dart';
 
 extension ForecastResponseDtoMapper on ForecastResponseDto {
-  Weather toEntity() {
+  Weather toEntity({bool isFromCache = false, DateTime? lastUpdated}) {
     final hourlyCount = hourly.time.length;
     final dailyCount = daily.time.length;
 
@@ -12,12 +12,15 @@ extension ForecastResponseDtoMapper on ForecastResponseDto {
       latitude: latitude,
       longitude: longitude,
       timezone: timezone,
+      utcOffsetSeconds: utcOffsetSeconds,
       observedAt: DateTime.parse(current.time),
       temperature: current.temperature,
       apparentTemperature: current.apparentTemperature,
       relativeHumidity: current.relativeHumidity,
       weatherCode: current.weatherCode,
       windSpeed: current.windSpeed,
+      isFromCache: isFromCache,
+      lastUpdated: lastUpdated,
       hourly: List.generate(
         hourlyCount,
         (index) => HourlyForecast(

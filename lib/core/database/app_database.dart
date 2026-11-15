@@ -12,12 +12,31 @@ class SavedCities extends Table {
   DateTimeColumn get addedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [SavedCities])
+class CachedWeathers extends Table {
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+  TextColumn get jsonPayload => text()();
+  DateTimeColumn get fetchedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {latitude, longitude};
+}
+
+@DriftDatabase(tables: [SavedCities, CachedWeathers])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'weather_plus'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(cachedWeathers);
+          }
+        },
+      );
 }
 
 final appDatabase = AppDatabase();

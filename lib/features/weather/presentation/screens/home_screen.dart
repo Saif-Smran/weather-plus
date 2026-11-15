@@ -3,15 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/network/connectivity_provider.dart';
+import '../../../../core/notifications/notification_service.dart';
 import '../../../../core/theme/weather_atmosphere.dart';
+import '../../../../core/widget/home_widget_service.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/glass_card.dart';
+import '../../../air_quality/presentation/widgets/air_quality_card.dart';
 import '../../../city_search/domain/entities/city.dart';
 import '../../../saved_cities/presentation/providers/saved_cities_provider.dart';
 import '../../../settings/presentation/providers/settings_provider.dart';
 import '../../../settings/presentation/utils/weather_formatters.dart';
 import '../../data/location_service.dart';
 import '../providers/weather_providers.dart';
+import '../widgets/charts/forecast_charts_card.dart';
 import '../widgets/current_weather_header.dart';
 import '../widgets/current_weather_loading.dart';
 import '../widgets/daily_forecast_list.dart';
@@ -30,6 +35,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = ref.watch(localizationsProvider);
     final selectedCoordinates = latitude != null && longitude != null
         ? (latitude: latitude!, longitude: longitude!)
         : null;
@@ -44,7 +50,7 @@ class HomeScreen extends ConsumerWidget {
         scrolledUnderElevation: 0,
         centerTitle: false,
         title: Text(
-          cityName ?? 'Weather+',
+          cityName ?? l10n.appTitle,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -54,19 +60,19 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           _AppBarIconButton(
             icon: Icons.search,
-            tooltip: 'Search cities',
+            tooltip: l10n.searchCitiesTooltip,
             onPressed: () => context.push('/search'),
           ),
           const SizedBox(width: 6),
           _AppBarIconButton(
             icon: Icons.bookmark_outline,
-            tooltip: 'Saved cities',
+            tooltip: l10n.savedCitiesTooltip,
             onPressed: () => context.push('/saved'),
           ),
           const SizedBox(width: 6),
           _AppBarIconButton(
             icon: Icons.settings_outlined,
-            tooltip: 'Settings',
+            tooltip: l10n.settingsTooltip,
             onPressed: () => context.push('/settings'),
           ),
           const SizedBox(width: 12),
@@ -239,6 +245,9 @@ class _WeatherContent extends StatelessWidget {
             .maybeWhen(data: (value) => value, orElse: () => null);
     final settings = ref.watch(settingsProvider);
     final weatherAsync = ref.watch(weatherProvider(coordinates));
+    final isOffline = ref.watch(isOfflineProvider);
+    final l10n = ref.watch(localizationsProvider);
+    final isBengali = l10n.isBengali;
 
     final defaultAtmosphere = WeatherAtmosphere.fromWeather(null);
 
@@ -265,23 +274,38 @@ class _WeatherContent extends StatelessWidget {
         final atmosphere = WeatherAtmosphere.fromWeather(weather);
         final today = weather.daily.isNotEmpty ? weather.daily.first : null;
 
+        // Update home screen widget & check rain alert notifications in background
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final resolvedName = locationName ?? cityName ?? l10n.currentLocation;
+          HomeWidgetService.updateWeatherWidget(
+            weather: weather,
+            cityName: resolvedName,
+          );
+          ref.read(notificationServiceProvider).checkAndNotifyRain(
+            weather: weather,
+            cityName: resolvedName,
+            isEnabled: settings.rainAlertsEnabled,
+            isBengali: isBengali,
+          );
+        });
+
         // UV Level text
         final uv = today?.uvIndex ?? 0.0;
         final uvText = uv <= 2
-            ? 'Low'
+            ? l10n.uvLow
             : uv <= 5
-                ? 'Moderate'
+                ? l10n.uvModerate
                 : uv <= 7
-                    ? 'High'
-                    : 'Very High';
+                    ? l10n.uvHigh
+                    : l10n.uvVeryHigh;
 
         // Humidity description
         final hum = weather.relativeHumidity;
         final humText = hum < 35
-            ? 'Dry'
+            ? l10n.dry
             : hum <= 65
-                ? 'Comfortable'
-                : 'Humid';
+                ? l10n.comfortable
+                : l10n.humid;
 
         return WeatherAtmosphereBackground(
           atmosphere: atmosphere,
@@ -299,12 +323,42 @@ class _WeatherContent extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 children: [
+                  if (isOffline) ...[
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xE6C62828),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.wifi_off, color: Colors.white, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.noInternetBanner,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
                   // Current weather hero banner
                   CurrentWeatherHeader(
                     weather: weather,
                     temperatureUnit: settings.temperatureUnit,
-                    cityName: locationName ?? 'Current location',
+                    cityName: locationName ?? l10n.currentLocation,
                     atmosphere: atmosphere,
+                    isBengali: isBengali,
                   ),
 
                   const SizedBox(height: 12),
@@ -319,7 +373,7 @@ class _WeatherContent extends StatelessWidget {
                             .read(savedCitiesRepositoryProvider)
                             .add(
                               City(
-                                name: locationName ?? cityName ?? 'Current location',
+                                name: locationName ?? cityName ?? l10n.currentLocation,
                                 country: '',
                                 adminRegion: null,
                                 latitude: coordinates.latitude,
@@ -335,8 +389,8 @@ class _WeatherContent extends StatelessWidget {
                             ),
                             content: Text(
                               added == null
-                                  ? 'City already saved'
-                                  : 'City saved to favorites',
+                                  ? l10n.cityAlreadySaved
+                                  : l10n.citySaved,
                             ),
                           ),
                         );
@@ -353,18 +407,18 @@ class _WeatherContent extends StatelessWidget {
                             color: Colors.white.withValues(alpha: 0.22),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.bookmark_add_outlined,
                               color: Colors.white,
                               size: 16,
                             ),
-                            SizedBox(width: 6),
+                            const SizedBox(width: 6),
                             Text(
-                              'Save city',
-                              style: TextStyle(
+                              l10n.saveCity,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -380,81 +434,99 @@ class _WeatherContent extends StatelessWidget {
 
                   // Next 24 hours
                   _SectionCard(
-                    title: 'Hourly Forecast',
+                    title: l10n.hourlyForecast,
                     icon: Icons.access_time_rounded,
                     atmosphere: atmosphere,
                     child: HourlyForecastList(
                       forecasts: weather.hourly,
                       atmosphere: atmosphere,
+                      isBengali: isBengali,
                     ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // 24-Hour Trends Chart
+                  ForecastChartsCard(
+                    forecasts: weather.hourly,
+                    atmosphere: atmosphere,
                   ),
 
                   const SizedBox(height: 18),
 
                   // 7-day forecast
                   _SectionCard(
-                    title: '7-Day Forecast',
+                    title: l10n.sevenDayForecast,
                     icon: Icons.calendar_today_rounded,
                     atmosphere: atmosphere,
                     child: DailyForecastList(
                       forecasts: weather.daily,
                       currentTemperature: weather.temperature,
                       atmosphere: atmosphere,
+                      isBengali: isBengali,
                     ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // Air Quality Card
+                  AirQualityCard(
+                    coordinates: coordinates,
+                    atmosphere: atmosphere,
                   ),
 
                   const SizedBox(height: 18),
 
                   // Today at a glance
                   _SectionCard(
-                    title: 'Today at a Glance',
+                    title: l10n.todayAtAGlance,
                     icon: Icons.dashboard_outlined,
                     atmosphere: atmosphere,
                     child: StatsGrid(
                       atmosphere: atmosphere,
                       stats: [
                         StatItem(
-                          label: 'Humidity',
+                          label: l10n.humidity,
                           value: '${weather.relativeHumidity}%',
                           icon: Icons.water_drop_outlined,
                           subtitle: humText,
                           iconColor: const Color(0xFF81D4FA),
                         ),
                         StatItem(
-                          label: 'Wind',
+                          label: l10n.wind,
                           value: formatWind(weather.windSpeed, settings.windUnit),
                           icon: Icons.air,
-                          subtitle: 'Speed',
+                          subtitle: l10n.speedLabel,
                           iconColor: const Color(0xFF80CBC4),
                         ),
                         if (today != null) ...[
                           StatItem(
-                            label: 'UV Index',
+                            label: l10n.uvIndex,
                             value: today.uvIndex.toStringAsFixed(1),
                             icon: Icons.wb_sunny_outlined,
                             subtitle: uvText,
                             iconColor: const Color(0xFFFFD54F),
                           ),
                           StatItem(
-                            label: 'Sunrise',
-                            value: DateFormat.jm().format(today.sunrise),
+                            label: l10n.sunrise,
+                            value: DateFormat.jm(isBengali ? 'bn' : 'en').format(today.sunrise),
                             icon: Icons.wb_twilight,
-                            subtitle: 'Dawn',
+                            subtitle: l10n.dawnLabel,
                             iconColor: const Color(0xFFFFAB91),
                           ),
                           StatItem(
-                            label: 'Sunset',
-                            value: DateFormat.jm().format(today.sunset),
+                            label: l10n.sunset,
+                            value: DateFormat.jm(isBengali ? 'bn' : 'en').format(today.sunset),
                             icon: Icons.nightlight_outlined,
-                            subtitle: 'Dusk',
+                            subtitle: l10n.duskLabel,
                             iconColor: const Color(0xFFCE93D8),
                           ),
                         ],
                         StatItem(
-                          label: 'Updated',
-                          value: DateFormat.jm().format(weather.observedAt),
+                          label: l10n.updated,
+                          value: DateFormat.jm(isBengali ? 'bn' : 'en').format(weather.observedAt),
                           icon: Icons.update,
-                          subtitle: 'Live data',
+                          subtitle: l10n.liveDataLabel,
                           iconColor: const Color(0xFFB0BEC5),
                         ),
                       ],

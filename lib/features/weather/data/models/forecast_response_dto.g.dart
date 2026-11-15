@@ -11,6 +11,7 @@ _ForecastResponseDto _$ForecastResponseDtoFromJson(Map<String, dynamic> json) =>
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       timezone: json['timezone'] as String,
+      utcOffsetSeconds: (json['utc_offset_seconds'] as num?)?.toInt(),
       current: CurrentWeatherDto.fromJson(
         json['current'] as Map<String, dynamic>,
       ),
@@ -24,6 +25,7 @@ Map<String, dynamic> _$ForecastResponseDtoToJson(
   'latitude': instance.latitude,
   'longitude': instance.longitude,
   'timezone': instance.timezone,
+  'utc_offset_seconds': instance.utcOffsetSeconds,
   'current': instance.current,
   'hourly': instance.hourly,
   'daily': instance.daily,

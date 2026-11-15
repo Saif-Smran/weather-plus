@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ForecastResponseDto {
 
- double get latitude; double get longitude; String get timezone; CurrentWeatherDto get current; HourlyDto get hourly; DailyDto get daily;
+ double get latitude; double get longitude; String get timezone;@JsonKey(name: 'utc_offset_seconds') int? get utcOffsetSeconds; CurrentWeatherDto get current; HourlyDto get hourly; DailyDto get daily;
 /// Create a copy of ForecastResponseDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $ForecastResponseDtoCopyWith<ForecastResponseDto> get copyWith => _$ForecastResp
 @override
 bool operator ==(Object other) {
   final _this = this as ForecastResponseDto;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForecastResponseDto&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.timezone, _this.timezone) || other.timezone == _this.timezone)&&(identical(other.current, _this.current) || other.current == _this.current)&&(identical(other.hourly, _this.hourly) || other.hourly == _this.hourly)&&(identical(other.daily, _this.daily) || other.daily == _this.daily));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForecastResponseDto&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.timezone, _this.timezone) || other.timezone == _this.timezone)&&(identical(other.utcOffsetSeconds, _this.utcOffsetSeconds) || other.utcOffsetSeconds == _this.utcOffsetSeconds)&&(identical(other.current, _this.current) || other.current == _this.current)&&(identical(other.hourly, _this.hourly) || other.hourly == _this.hourly)&&(identical(other.daily, _this.daily) || other.daily == _this.daily));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as ForecastResponseDto;
-  return Object.hash(runtimeType,_this.latitude,_this.longitude,_this.timezone,_this.current,_this.hourly,_this.daily);
+  return Object.hash(runtimeType,_this.latitude,_this.longitude,_this.timezone,_this.utcOffsetSeconds,_this.current,_this.hourly,_this.daily);
 }
 
 @override
 String toString() {
   final _this = this as ForecastResponseDto;
-  return 'ForecastResponseDto(latitude: ${_this.latitude}, longitude: ${_this.longitude}, timezone: ${_this.timezone}, current: ${_this.current}, hourly: ${_this.hourly}, daily: ${_this.daily})';
+  return 'ForecastResponseDto(latitude: ${_this.latitude}, longitude: ${_this.longitude}, timezone: ${_this.timezone}, utcOffsetSeconds: ${_this.utcOffsetSeconds}, current: ${_this.current}, hourly: ${_this.hourly}, daily: ${_this.daily})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $ForecastResponseDtoCopyWith<$Res>  {
   factory $ForecastResponseDtoCopyWith(ForecastResponseDto value, $Res Function(ForecastResponseDto) _then) = _$ForecastResponseDtoCopyWithImpl;
 @useResult
 $Res call({
- double latitude, double longitude, String timezone, CurrentWeatherDto current, HourlyDto hourly, DailyDto daily
+ double latitude, double longitude, String timezone,@JsonKey(name: 'utc_offset_seconds') int? utcOffsetSeconds, CurrentWeatherDto current, HourlyDto hourly, DailyDto daily
 });
 
 
@@ -71,12 +71,13 @@ class _$ForecastResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of ForecastResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? latitude = null,Object? longitude = null,Object? timezone = null,Object? current = null,Object? hourly = null,Object? daily = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? latitude = null,Object? longitude = null,Object? timezone = null,Object? utcOffsetSeconds = freezed,Object? current = null,Object? hourly = null,Object? daily = null,}) {
   return _then(ForecastResponseDto(
 latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,timezone: null == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
-as String,current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
+as String,utcOffsetSeconds: freezed == utcOffsetSeconds ? _self.utcOffsetSeconds : utcOffsetSeconds // ignore: cast_nullable_to_non_nullable
+as int?,current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
 as CurrentWeatherDto,hourly: null == hourly ? _self.hourly : hourly // ignore: cast_nullable_to_non_nullable
 as HourlyDto,daily: null == daily ? _self.daily : daily // ignore: cast_nullable_to_non_nullable
 as DailyDto,
@@ -191,10 +192,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double latitude,  double longitude,  String timezone,  CurrentWeatherDto current,  HourlyDto hourly,  DailyDto daily)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double latitude,  double longitude,  String timezone, @JsonKey(name: 'utc_offset_seconds')  int? utcOffsetSeconds,  CurrentWeatherDto current,  HourlyDto hourly,  DailyDto daily)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ForecastResponseDto() when $default != null:
-return $default(_that.latitude,_that.longitude,_that.timezone,_that.current,_that.hourly,_that.daily);case _:
+return $default(_that.latitude,_that.longitude,_that.timezone,_that.utcOffsetSeconds,_that.current,_that.hourly,_that.daily);case _:
   return orElse();
 
 }
@@ -212,10 +213,10 @@ return $default(_that.latitude,_that.longitude,_that.timezone,_that.current,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double latitude,  double longitude,  String timezone,  CurrentWeatherDto current,  HourlyDto hourly,  DailyDto daily)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double latitude,  double longitude,  String timezone, @JsonKey(name: 'utc_offset_seconds')  int? utcOffsetSeconds,  CurrentWeatherDto current,  HourlyDto hourly,  DailyDto daily)  $default,) {final _that = this;
 switch (_that) {
 case _ForecastResponseDto():
-return $default(_that.latitude,_that.longitude,_that.timezone,_that.current,_that.hourly,_that.daily);case _:
+return $default(_that.latitude,_that.longitude,_that.timezone,_that.utcOffsetSeconds,_that.current,_that.hourly,_that.daily);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -232,10 +233,10 @@ return $default(_that.latitude,_that.longitude,_that.timezone,_that.current,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double latitude,  double longitude,  String timezone,  CurrentWeatherDto current,  HourlyDto hourly,  DailyDto daily)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double latitude,  double longitude,  String timezone, @JsonKey(name: 'utc_offset_seconds')  int? utcOffsetSeconds,  CurrentWeatherDto current,  HourlyDto hourly,  DailyDto daily)?  $default,) {final _that = this;
 switch (_that) {
 case _ForecastResponseDto() when $default != null:
-return $default(_that.latitude,_that.longitude,_that.timezone,_that.current,_that.hourly,_that.daily);case _:
+return $default(_that.latitude,_that.longitude,_that.timezone,_that.utcOffsetSeconds,_that.current,_that.hourly,_that.daily);case _:
   return null;
 
 }
@@ -247,12 +248,13 @@ return $default(_that.latitude,_that.longitude,_that.timezone,_that.current,_tha
 @JsonSerializable()
 
 class _ForecastResponseDto implements ForecastResponseDto {
-  const _ForecastResponseDto({required this.latitude, required this.longitude, required this.timezone, required this.current, required this.hourly, required this.daily});
+  const _ForecastResponseDto({required this.latitude, required this.longitude, required this.timezone, @JsonKey(name: 'utc_offset_seconds') this.utcOffsetSeconds, required this.current, required this.hourly, required this.daily});
   factory _ForecastResponseDto.fromJson(Map<String, dynamic> json) => _$ForecastResponseDtoFromJson(json);
 
 @override final  double latitude;
 @override final  double longitude;
 @override final  String timezone;
+@override@JsonKey(name: 'utc_offset_seconds') final  int? utcOffsetSeconds;
 @override final  CurrentWeatherDto current;
 @override final  HourlyDto hourly;
 @override final  DailyDto daily;
@@ -270,18 +272,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForecastResponseDto&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&(identical(other.current, current) || other.current == current)&&(identical(other.hourly, hourly) || other.hourly == hourly)&&(identical(other.daily, daily) || other.daily == daily));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForecastResponseDto&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.timezone, timezone) || other.timezone == timezone)&&(identical(other.utcOffsetSeconds, utcOffsetSeconds) || other.utcOffsetSeconds == utcOffsetSeconds)&&(identical(other.current, current) || other.current == current)&&(identical(other.hourly, hourly) || other.hourly == hourly)&&(identical(other.daily, daily) || other.daily == daily));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,latitude,longitude,timezone,current,hourly,daily);
+    return Object.hash(runtimeType,latitude,longitude,timezone,utcOffsetSeconds,current,hourly,daily);
 }
 
 @override
 String toString() {
-    return 'ForecastResponseDto(latitude: $latitude, longitude: $longitude, timezone: $timezone, current: $current, hourly: $hourly, daily: $daily)';
+    return 'ForecastResponseDto(latitude: $latitude, longitude: $longitude, timezone: $timezone, utcOffsetSeconds: $utcOffsetSeconds, current: $current, hourly: $hourly, daily: $daily)';
 }
 
 
@@ -292,7 +294,7 @@ abstract mixin class _$ForecastResponseDtoCopyWith<$Res> implements $ForecastRes
   factory _$ForecastResponseDtoCopyWith(_ForecastResponseDto value, $Res Function(_ForecastResponseDto) _then) = __$ForecastResponseDtoCopyWithImpl;
 @override @useResult
 $Res call({
- double latitude, double longitude, String timezone, CurrentWeatherDto current, HourlyDto hourly, DailyDto daily
+ double latitude, double longitude, String timezone,@JsonKey(name: 'utc_offset_seconds') int? utcOffsetSeconds, CurrentWeatherDto current, HourlyDto hourly, DailyDto daily
 });
 
 
@@ -309,12 +311,13 @@ class __$ForecastResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of ForecastResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? latitude = null,Object? longitude = null,Object? timezone = null,Object? current = null,Object? hourly = null,Object? daily = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? latitude = null,Object? longitude = null,Object? timezone = null,Object? utcOffsetSeconds = freezed,Object? current = null,Object? hourly = null,Object? daily = null,}) {
   return _then(_ForecastResponseDto(
 latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,timezone: null == timezone ? _self.timezone : timezone // ignore: cast_nullable_to_non_nullable
-as String,current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
+as String,utcOffsetSeconds: freezed == utcOffsetSeconds ? _self.utcOffsetSeconds : utcOffsetSeconds // ignore: cast_nullable_to_non_nullable
+as int?,current: null == current ? _self.current : current // ignore: cast_nullable_to_non_nullable
 as CurrentWeatherDto,hourly: null == hourly ? _self.hourly : hourly // ignore: cast_nullable_to_non_nullable
 as HourlyDto,daily: null == daily ? _self.daily : daily // ignore: cast_nullable_to_non_nullable
 as DailyDto,

@@ -5,7 +5,17 @@ class WeatherCodeInfo {
   final String icon;
 }
 
-WeatherCodeInfo weatherCodeInfo(int code, {bool isDay = true}) {
+WeatherCodeInfo weatherCodeInfo(
+  int code, {
+  bool isDay = true,
+  bool isBengali = false,
+}) {
+  final info = _resolveBaseInfo(code, isDay);
+  if (!isBengali) return info;
+  return WeatherCodeInfo(_toBengaliDescription(info.description), info.icon);
+}
+
+WeatherCodeInfo _resolveBaseInfo(int code, bool isDay) {
   if (code == 0) {
     return WeatherCodeInfo('Clear sky', isDay ? '☀️' : '🌙');
   }
@@ -35,4 +45,31 @@ WeatherCodeInfo weatherCodeInfo(int code, {bool isDay = true}) {
     return const WeatherCodeInfo('Thunderstorm', '⛈️');
   }
   return const WeatherCodeInfo('Unknown conditions', '🌡️');
+}
+
+String _toBengaliDescription(String english) {
+  switch (english.toLowerCase()) {
+    case 'clear sky':
+      return 'পরিষ্কার আকাশ';
+    case 'partly cloudy':
+      return 'আংশিক মেঘলা';
+    case 'overcast':
+      return 'মেঘাচ্ছন্ন';
+    case 'fog':
+      return 'কুয়াশা';
+    case 'drizzle':
+      return 'গুড়ি গুড়ি বৃষ্টি';
+    case 'rain':
+      return 'বৃষ্টি';
+    case 'snow':
+      return 'তুষারপাত';
+    case 'rain showers':
+      return 'বৃষ্টির ধারা';
+    case 'snow showers':
+      return 'তুষার ঝরনা';
+    case 'thunderstorm':
+      return 'বজ্রঝড়';
+    default:
+      return 'অজানা আবহাওয়া';
+  }
 }

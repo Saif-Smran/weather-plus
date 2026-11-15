@@ -13,6 +13,7 @@ abstract class ForecastResponseDto with _$ForecastResponseDto {
     required double latitude,
     required double longitude,
     required String timezone,
+    @JsonKey(name: 'utc_offset_seconds') int? utcOffsetSeconds,
     required CurrentWeatherDto current,
     required HourlyDto hourly,
     required DailyDto daily,

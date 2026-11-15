@@ -6,6 +6,7 @@ class Weather {
     required this.latitude,
     required this.longitude,
     required this.timezone,
+    this.utcOffsetSeconds,
     required this.observedAt,
     required this.temperature,
     required this.apparentTemperature,
@@ -14,11 +15,14 @@ class Weather {
     required this.windSpeed,
     required this.hourly,
     required this.daily,
+    this.isFromCache = false,
+    this.lastUpdated,
   });
 
   final double latitude;
   final double longitude;
   final String timezone;
+  final int? utcOffsetSeconds;
   final DateTime observedAt;
   final double temperature;
   final double apparentTemperature;
@@ -27,4 +31,15 @@ class Weather {
   final double windSpeed;
   final List<HourlyForecast> hourly;
   final List<DailyForecast> daily;
+  final bool isFromCache;
+  final DateTime? lastUpdated;
+
+  /// Returns the current local time of the queried location/city.
+  /// Uses [utcOffsetSeconds] from the weather provider, falling back to [observedAt].
+  DateTime get currentLocalTime {
+    if (utcOffsetSeconds != null) {
+      return DateTime.now().toUtc().add(Duration(seconds: utcOffsetSeconds!));
+    }
+    return observedAt;
+  }
 }
