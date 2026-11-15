@@ -8,34 +8,35 @@ A production-style weather application built with Flutter, Riverpod, and Clean A
 
 - **Accurate City Local Time**:
   - Automatically calculates and displays the **current local time** of any searched city across the globe using real-time UTC offsets.
-  - The dynamic atmosphere (day, night, dawn, dusk) seamlessly adapts to the time of the searched city, not just the phone's timezone.
+  - The dynamic atmosphere (day, night, dawn, dusk) seamlessly adapts to the local time of the searched city, not just the phone's timezone.
 - **Dynamic Atmosphere Engine**:
   - **Daytime**: Radiant sky with an animated sun, warm light, and daylight color palettes.
   - **Nighttime**: Deep dark shades (midnight indigo/slate), luminous crescent moon, and twinkling stars.
   - **Dawn / Dusk**: Golden hour / twilight hues blending amber, magenta, and dusky violet based on local sunrise/sunset.
   - **Temperature-Adaptive**: Cool crystalline cyan undertones in cold weather (< 6°C), warm amber/golden tones in hot weather (> 28°C).
   - **Weather-Reactive Elements**: Animated rain streaks, drifting clouds, and snow particles.
-- **Glassmorphic UI**: Translucent frosted glass cards with gaussian blur (`BackdropFilter`) allowing the dynamic sky to shine through.
+- **Glassmorphic UI**: Translucent frosted glass cards with gaussian blur (`BackdropFilter`) allowing the dynamic sky canvas to shine through.
+- **Hourly Forecast (Next 24 Hours)**:
+  - Dynamically starts with the **current local hour** (highlighted with a "Now" / "এখন" badge) and continues for the next 24 consecutive hours.
+  - Displays weather condition icons, temperature, and precipitation probability pills.
+- **Synchronized 24-Hour Trends Charts**:
+  - Powered by `fl_chart`.
+  - Plots the upcoming 24 hours starting with the current time.
+  - **Temperature Chart**: Smooth curved line chart with gradient fill, touch tooltips, and 4-hour bottom-axis intervals.
+  - **Rain Chart**: Precipitation probability bar chart synchronized with the temperature chart's 4-hour intervals to prevent label crowding.
+- **Air Quality Card**:
+  - Independent loading with US AQI (0–500), PM2.5, and PM10 pollutants.
+  - Visual spectrum bar and official health advisory descriptions with color-coded safety levels (Good, Moderate, Sensitive, Unhealthy, Very Unhealthy, Hazardous).
+- **Bengali Localization (বাংলা লোকালাইজেশন)**:
+  - Complete bilingual support (`English` / `বাংলা`) switchable in Settings.
+  - **24-Hour Trends**: Localized section title (**২৪ ঘণ্টার প্রবণতা**), tabs (**তাপমাত্রা**, **বৃষ্টি**), tooltips, and time axes.
+  - **Air Quality**: Localized title (**বায়ু মান সূচক**), all category badges (**ভালো**, **সহনীয়**, **সংবেদনশীলদের জন্য অস্বাস্থ্যকর**, **অস্বাস্থ্যকর**, **খুবই অস্বাস্থ্যকর**, **বিপজ্জনক**), health descriptions, and pollutant metrics (**পিএম ২.৫**, **পিএম ১০**).
+  - Native Bengali numeral conversions (`০-৯`) across temperatures, percentages, and metrics.
 - **Offline-First Caching**:
   - Powered by Drift SQLite database (`CachedWeathers` table).
   - Automatically caches the latest weather response.
   - On network loss or timeout, instantly falls back to cached data with an offline indicator and timestamp.
   - Real-time connection monitoring with `connectivity_plus`.
-- **Air Quality Card**:
-  - Independent loading with US AQI (0–500), PM2.5, and PM10 pollutants.
-  - Visual spectrum bar and official health advisory descriptions with color-coded safety levels (Good, Moderate, Sensitive, Unhealthy, Very Unhealthy, Hazardous).
-- **Interactive 24-Hour Trends Charts**:
-  - Powered by `fl_chart`.
-  - Temperature trend smooth curved line chart with gradient fill and touch tooltips.
-  - Precipitation probability bar chart with rain volume indicators.
-- **Hero Header**: Live local date & time, large temperature display, high/low range, and feels-like temperature.
-- **Hourly Forecast**: 24-hour horizontal forecast with day/night weather icons, "Now" highlight badge, and precipitation probability pills.
-- **7-Day Forecast**: Weekly forecast featuring visual temperature gradient range bars with current temperature indicators.
-- **Today at a Glance**: Responsive metrics grid (Humidity, Wind Speed, UV Index, Sunrise, Sunset, and Last Updated).
-- **Search & Favorites**: Debounced search for cities worldwide with offline caching and saved locations.
-- **Bengali Localization (বাংলা লোকালাইজেশন)**:
-  - In-app language switcher (`English` / `বাংলা`) with instant translation across all weather conditions, metrics, and navigation.
-  - Automatic Bengali numerals formatting.
 - **Rain Alert Notifications**:
   - Powered by `flutter_local_notifications`.
   - Scans upcoming hourly forecasts for high precipitation probability (> 50%).
@@ -43,6 +44,9 @@ A production-style weather application built with Flutter, Riverpod, and Clean A
 - **Home Screen Widget**:
   - Powered by `home_widget` and native Android `AppWidgetProvider`.
   - Displays live city name, temperature, weather icon, condition, and high/low range on your Android home screen.
+- **7-Day Forecast**: Weekly forecast featuring visual temperature gradient range bars with current temperature indicators.
+- **Today at a Glance**: Responsive metrics grid (Humidity, Wind Speed, UV Index, Sunrise, Sunset, and Last Updated).
+- **Search & Favorites**: Debounced search for cities worldwide with offline caching and saved locations.
 - **Customizable Settings**: Toggle between Celsius (°C) / Fahrenheit (°F), km/h / mph, Theme Mode, Language, and Rain Alerts.
 
 ---
@@ -88,10 +92,16 @@ lib/
 │   ├── database/
 │   │   ├── app_database.dart           # Drift SQLite database (SavedCities, CachedWeathers)
 │   │   └── app_database.g.dart
+│   ├── localization/
+│   │   └── app_localizations.dart      # English & Bengali translation engine + numeral formatter
 │   ├── network/
 │   │   ├── dio_client.dart             # Dio network client with timeouts and logging
 │   │   ├── api_exception.dart          # Typed API exceptions
 │   │   └── connectivity_provider.dart  # Real-time connection monitoring
+│   ├── notifications/
+│   │   └── notification_service.dart   # Rain alert dispatch & permission management
+│   ├── widget/
+│   │   └── home_widget_service.dart    # Android Home Screen Widget updater
 │   ├── router/
 │   │   └── app_router.dart             # GoRouter routes (/ , /search, /saved, /settings)
 │   ├── theme/
@@ -117,7 +127,7 @@ lib/
     │       └── widgets/                # Section widgets
     │           ├── weather_atmosphere_background.dart # Dynamic sky canvas (Sun, Moon, Stars)
     │           ├── current_weather_header.dart        # Hero weather banner (Local Time)
-    │           ├── hourly_forecast_list.dart          # 24h scrollable list
+    │           ├── hourly_forecast_list.dart          # Next 24h scrollable list
     │           ├── daily_forecast_list.dart           # 7-day range bars
     │           ├── stats_grid.dart                    # "At a glance" grid
     │           ├── stat_card.dart                     # Metric card item
@@ -125,6 +135,7 @@ lib/
     │           └── charts/                            # Interactive trends
     │               ├── temperature_chart.dart         # 24h temperature line chart
     │               ├── rain_chart.dart                # 24h rain probability bar chart
+    │               ├── chart_data_mapper.dart         # fl_chart data mappers
     │               └── forecast_charts_card.dart      # Tabbed chart container
     │
     ├── air_quality/                    # Air quality feature
@@ -155,13 +166,22 @@ Inside `home_screen.dart`, locate **`_WeatherContent.build()`**. In its `ListVie
 | :--- | :--- | :--- |
 | **Hero Weather Banner** | `CurrentWeatherHeader(...)` | [`current_weather_header.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/current_weather_header.dart) |
 | **Save City Action** | `InkWell(child: ... 'Save city' ...)` | [`home_screen.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/screens/home_screen.dart) |
-| **Hourly Forecast** | `_SectionCard(title: 'Hourly Forecast', child: HourlyForecastList(...))` | [`hourly_forecast_list.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/hourly_forecast_list.dart) |
+| **Hourly Forecast (24h)** | `_SectionCard(title: l10n.hourlyForecast, child: HourlyForecastList(...))` | [`hourly_forecast_list.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/hourly_forecast_list.dart) |
 | **24-Hour Trends Chart** | `ForecastChartsCard(...)` | [`forecast_charts_card.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/charts/forecast_charts_card.dart) |
-| **7-Day Forecast** | `_SectionCard(title: '7-Day Forecast', child: DailyForecastList(...))` | [`daily_forecast_list.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/daily_forecast_list.dart) |
+| **7-Day Forecast** | `_SectionCard(title: l10n.sevenDayForecast, child: DailyForecastList(...))` | [`daily_forecast_list.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/daily_forecast_list.dart) |
 | **Air Quality** | `AirQualityCard(...)` | [`air_quality_card.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/air_quality/presentation/widgets/air_quality_card.dart) |
-| **Today at a Glance** | `_SectionCard(title: 'Today at a Glance', child: StatsGrid(...))` | [`stats_grid.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/stats_grid.dart) |
+| **Today at a Glance** | `_SectionCard(title: l10n.todayAtAGlance, child: StatsGrid(...))` | [`stats_grid.dart`](file:///d:/Flatter%20test/weather_plus/lib/features/weather/presentation/widgets/stats_grid.dart) |
 
 To reorder any section, simply swap the order of the widgets inside the `ListView` children list.
+
+---
+
+## 🛠️ Android Build & Compatibility
+
+- **Target SDK**: Android 14/15/16 (API 34/35/36).
+- **Core Library Desugaring**: Enabled via `com.android.tools:desugar_jdk_libs:2.1.4` in `android/app/build.gradle.kts` for Java 8+ / Java 17 compatibility.
+- **Local Notifications**: Powered by `flutter_local_notifications: ^18.0.1`.
+- **CMake & Gradle 9.x Support**: Native build tasks include transient artifact state handling (`task.doNotTrackState(...)`) to prevent file lock and state tracking conflicts during incremental builds on Windows.
 
 ---
 
@@ -182,10 +202,10 @@ dart run build_runner build -d
 # Run on connected device / emulator
 flutter run
 
-# Run test suite
+# Run test suite (47 automated tests)
 flutter test
 
-# Run static analysis
+# Run static analysis (0 warnings / errors)
 flutter analyze
 ```
 
