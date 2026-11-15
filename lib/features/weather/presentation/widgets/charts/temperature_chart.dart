@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../core/localization/app_localizations.dart';
 import '../../../domain/entities/hourly_forecast.dart';
 import 'chart_data_mapper.dart';
 
@@ -9,15 +10,18 @@ class TemperatureChart extends StatelessWidget {
   const TemperatureChart({
     super.key,
     required this.forecasts,
+    this.isBengali = false,
   });
 
   final List<HourlyForecast> forecasts;
+  final bool isBengali;
 
   @override
   Widget build(BuildContext context) {
     final list = forecasts.take(24).toList();
     if (list.isEmpty) return const SizedBox.shrink();
 
+    final l10n = AppLocalizations(isBengali ? AppLanguage.bengali : AppLanguage.english);
     final spots = ChartDataMapper.mapTemperatureSpots(list);
     final bounds = ChartDataMapper.getTemperatureBounds(list);
 
@@ -48,7 +52,9 @@ class TemperatureChart extends StatelessWidget {
                 interval: 5,
                 getTitlesWidget: (value, meta) {
                   return Text(
-                    '${value.toInt()}°',
+                    isBengali
+                        ? '${l10n.formatNumber(value.toInt())}°'
+                        : '${value.toInt()}°',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.6),
                       fontSize: 10,
@@ -68,10 +74,14 @@ class TemperatureChart extends StatelessWidget {
                     return const SizedBox.shrink();
                   }
                   final time = list[index].time;
+                  final label = index == 0
+                      ? (isBengali ? 'এখন' : 'Now')
+                      : DateFormat('ha', isBengali ? 'bn' : 'en').format(time);
+
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      DateFormat('ha').format(time),
+                      label,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 10,
@@ -117,9 +127,14 @@ class TemperatureChart extends StatelessWidget {
                 return touchedSpots.map((spot) {
                   final index = spot.x.toInt();
                   final forecast = list[index];
-                  final timeStr = DateFormat('h a').format(forecast.time);
+                  final timeStr = index == 0
+                      ? (isBengali ? 'এখন' : 'Now')
+                      : DateFormat('h a', isBengali ? 'bn' : 'en').format(forecast.time);
+                  final tempStr = isBengali
+                      ? '${l10n.formatNumber(spot.y.round())}°'
+                      : '${spot.y.round()}°';
                   return LineTooltipItem(
-                    '$timeStr\n${spot.y.round()}°',
+                    '$timeStr\n$tempStr',
                     const TextStyle(
                       color: Colors.white,
                       fontSize: 12,

@@ -27,7 +27,7 @@ class NotificationService {
       iOS: darwinSettings,
     );
 
-    await _plugin.initialize(settings: initSettings);
+    await _plugin.initialize(initSettings);
     _initialized = true;
   }
 
@@ -69,10 +69,10 @@ class NotificationService {
         : 'Rain probability is $probability% in $cityName around $timeStr.';
 
     await _plugin.show(
-      id: 1001,
-      title: title,
-      body: body,
-      notificationDetails: notificationDetails,
+      1001,
+      title,
+      body,
+      notificationDetails,
     );
   }
 

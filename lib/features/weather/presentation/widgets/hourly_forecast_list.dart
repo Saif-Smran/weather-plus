@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/weather_atmosphere.dart';
 import '../../../../core/utils/weather_code_mapper.dart';
 import '../../../../core/widgets/glass_card.dart';
@@ -21,6 +22,7 @@ class HourlyForecastList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visibleForecasts = forecasts.take(24).toList();
+    final l10n = AppLocalizations(isBengali ? AppLanguage.bengali : AppLanguage.english);
 
     return SizedBox(
       height: 148,
@@ -73,7 +75,9 @@ class HourlyForecastList extends StatelessWidget {
                     style: const TextStyle(fontSize: 28),
                   ),
                   Text(
-                    '${forecast.temperature.round()}°',
+                    isBengali
+                        ? '${l10n.formatNumber(forecast.temperature.round())}°'
+                        : '${forecast.temperature.round()}°',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -91,7 +95,9 @@ class HourlyForecastList extends StatelessWidget {
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          '${forecast.precipitationProbability}%',
+                          isBengali
+                              ? '${l10n.formatNumber(forecast.precipitationProbability)}%'
+                              : '${forecast.precipitationProbability}%',
                           style: const TextStyle(
                             color: Color(0xFF80D8FF),
                             fontSize: 11,

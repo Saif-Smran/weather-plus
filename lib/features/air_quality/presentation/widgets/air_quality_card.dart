@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/weather_atmosphere.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../domain/utils/aqi_mapper.dart';
@@ -11,14 +12,17 @@ class AirQualityCard extends ConsumerWidget {
     super.key,
     required this.coordinates,
     this.atmosphere,
+    this.isBengali = false,
   });
 
   final ({double latitude, double longitude}) coordinates;
   final WeatherAtmosphere? atmosphere;
+  final bool isBengali;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final aqiAsync = ref.watch(airQualityProvider(coordinates));
+    final l10n = AppLocalizations(isBengali ? AppLanguage.bengali : AppLanguage.english);
 
     return aqiAsync.when(
       loading: () => GlassCard(
@@ -35,7 +39,7 @@ class AirQualityCard extends ConsumerWidget {
       ),
       error: (error, stack) => const SizedBox.shrink(),
       data: (aqi) {
-        final info = mapAqiCategory(aqi.usAqi);
+        final info = mapAqiCategory(aqi.usAqi, isBengali: isBengali);
 
         // Calculate progress percentage along AQI spectrum (0 to 300)
         final progress = (aqi.usAqi / 300).clamp(0.0, 1.0);
@@ -57,7 +61,7 @@ class AirQualityCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${aqi.usAqi}',
+                          isBengali ? l10n.formatNumber(aqi.usAqi) : '${aqi.usAqi}',
                           style: TextStyle(
                             color: info.color,
                             fontSize: 38,
@@ -68,7 +72,7 @@ class AirQualityCard extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'AIR QUALITY INDEX',
+                          l10n.airQualityIndex,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 11,
@@ -175,8 +179,10 @@ class AirQualityCard extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _PollutantMetric(
-                      label: 'PM2.5',
-                      value: '${aqi.pm2_5.toStringAsFixed(1)} µg/m³',
+                      label: l10n.pm2_5Label,
+                      value: isBengali
+                          ? '${l10n.formatNumber(aqi.pm2_5.toStringAsFixed(1))} µg/m³'
+                          : '${aqi.pm2_5.toStringAsFixed(1)} µg/m³',
                     ),
                   ),
                   Container(
@@ -186,8 +192,10 @@ class AirQualityCard extends ConsumerWidget {
                   ),
                   Expanded(
                     child: _PollutantMetric(
-                      label: 'PM10',
-                      value: '${aqi.pm10.toStringAsFixed(1)} µg/m³',
+                      label: l10n.pm10Label,
+                      value: isBengali
+                          ? '${l10n.formatNumber(aqi.pm10.toStringAsFixed(1))} µg/m³'
+                          : '${aqi.pm10.toStringAsFixed(1)} µg/m³',
                     ),
                   ),
                 ],

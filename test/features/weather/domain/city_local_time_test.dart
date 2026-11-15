@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:weather_plus/features/weather/domain/entities/hourly_forecast.dart';
 import 'package:weather_plus/features/weather/domain/entities/weather.dart';
 
 void main() {
@@ -67,6 +68,42 @@ void main() {
       );
 
       expect(weather.currentLocalTime, observed);
+    });
+
+    test('next24Hours starts with the current local hour and returns 24 items', () {
+      final observed = DateTime(2026, 11, 15, 14, 25);
+      // Generate 72 hours of hourly forecasts from midnight
+      final hourlyList = List.generate(
+        72,
+        (i) => HourlyForecast(
+          time: DateTime(2026, 11, 15, 0, 0).add(Duration(hours: i)),
+          temperature: 20.0 + (i % 5),
+          precipitationProbability: (i * 3) % 100,
+          weatherCode: 1,
+        ),
+      );
+
+      final weather = Weather(
+        latitude: 23.81,
+        longitude: 90.41,
+        timezone: 'Asia/Dhaka',
+        utcOffsetSeconds: null, // will use observedAt
+        observedAt: observed,
+        temperature: 24.0,
+        apparentTemperature: 24.0,
+        relativeHumidity: 60,
+        weatherCode: 1,
+        windSpeed: 8.0,
+        hourly: hourlyList,
+        daily: const [],
+      );
+
+      final next24 = weather.next24Hours;
+      expect(next24.length, 24);
+      // The first item should start at 14:00 (the current hour)
+      expect(next24.first.time, DateTime(2026, 11, 15, 14, 0));
+      // The last item should be at 13:00 the next day (+23 hours)
+      expect(next24.last.time, DateTime(2026, 11, 16, 13, 0));
     });
   });
 }

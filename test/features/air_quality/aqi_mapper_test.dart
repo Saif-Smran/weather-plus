@@ -69,6 +69,27 @@ void main() {
 
       expect(info500.category, AqiCategory.hazardous);
     });
+
+    test('returns Bengali labels and descriptions when isBengali is true', () {
+      final good = mapAqiCategory(30, isBengali: true);
+      expect(good.label, 'ভালো');
+      expect(good.description, contains('বাতাসের মান সন্তোষজনক'));
+
+      final mod = mapAqiCategory(80, isBengali: true);
+      expect(mod.label, 'সহনীয়');
+
+      final unhSens = mapAqiCategory(120, isBengali: true);
+      expect(unhSens.label, 'সংবেদনশীলদের জন্য অস্বাস্থ্যকর');
+
+      final unh = mapAqiCategory(180, isBengali: true);
+      expect(unh.label, 'অস্বাস্থ্যকর');
+
+      final vUnh = mapAqiCategory(250, isBengali: true);
+      expect(vUnh.label, 'খুবই অস্বাস্থ্যকর');
+
+      final haz = mapAqiCategory(400, isBengali: true);
+      expect(haz.label, 'বিপজ্জনক');
+    });
   });
 }
 

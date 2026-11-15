@@ -438,7 +438,7 @@ class _WeatherContent extends StatelessWidget {
                     icon: Icons.access_time_rounded,
                     atmosphere: atmosphere,
                     child: HourlyForecastList(
-                      forecasts: weather.hourly,
+                      forecasts: weather.next24Hours,
                       atmosphere: atmosphere,
                       isBengali: isBengali,
                     ),
@@ -448,8 +448,9 @@ class _WeatherContent extends StatelessWidget {
 
                   // 24-Hour Trends Chart
                   ForecastChartsCard(
-                    forecasts: weather.hourly,
+                    forecasts: weather.next24Hours,
                     atmosphere: atmosphere,
+                    isBengali: isBengali,
                   ),
 
                   const SizedBox(height: 18),
@@ -473,6 +474,7 @@ class _WeatherContent extends StatelessWidget {
                   AirQualityCard(
                     coordinates: coordinates,
                     atmosphere: atmosphere,
+                    isBengali: isBengali,
                   ),
 
                   const SizedBox(height: 18),

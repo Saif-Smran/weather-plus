@@ -42,4 +42,46 @@ class Weather {
     }
     return observedAt;
   }
+
+  /// Returns the 24 hourly forecast items starting with the current local time/hour.
+  List<HourlyForecast> get next24Hours {
+    if (hourly.isEmpty) return const [];
+    final ref = currentLocalTime;
+
+    // 1. Try to find the exact matching hour on the same day
+    int startIndex = hourly.indexWhere(
+      (h) =>
+          h.time.year == ref.year &&
+          h.time.month == ref.month &&
+          h.time.day == ref.day &&
+          h.time.hour == ref.hour,
+    );
+
+    // 2. Fallback: find first item after ref - 30 minutes
+    if (startIndex == -1) {
+      startIndex = hourly.indexWhere(
+        (h) => !h.time.isBefore(ref.subtract(const Duration(minutes: 30))),
+      );
+    }
+
+    // 3. Fallback: find item with minimum absolute time difference
+    if (startIndex == -1) {
+      int bestIdx = 0;
+      int bestDiff = (hourly[0].time.difference(ref)).inMinutes.abs();
+      for (int i = 1; i < hourly.length; i++) {
+        final diff = (hourly[i].time.difference(ref)).inMinutes.abs();
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          bestIdx = i;
+        }
+      }
+      startIndex = bestIdx;
+    }
+
+    final slice = hourly.skip(startIndex).take(24).toList();
+    if (slice.isEmpty) {
+      return hourly.take(24).toList();
+    }
+    return slice;
+  }
 }

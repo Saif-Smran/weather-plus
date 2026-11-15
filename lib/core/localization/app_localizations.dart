@@ -36,6 +36,9 @@ class AppLocalizations {
   String get rainTab => isBengali ? 'বৃষ্টি' : 'Rain';
   String get sevenDayForecast => isBengali ? '৭ দিনের পূর্বাভাস' : '7-Day Forecast';
   String get airQualityIndex => isBengali ? 'বায়ু মান সূচক' : 'AIR QUALITY INDEX';
+  String get pm2_5Label => isBengali ? 'পিএম ২.৫' : 'PM2.5';
+  String get pm10Label => isBengali ? 'পিএম ১০' : 'PM10';
+  String get rainLabel => isBengali ? 'বৃষ্টি' : 'Rain';
   String get todayAtAGlance => isBengali ? 'এক নজরে আজকের আবহাওয়া' : 'Today at a Glance';
 
   // Metrics
@@ -111,7 +114,7 @@ class AppLocalizations {
   }
 
   // Digits translation helper
-  String formatNumber(num number) {
+  String formatNumber(Object number) {
     if (!isBengali) return number.toString();
     const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/localization/app_localizations.dart';
 import '../../../../../core/theme/weather_atmosphere.dart';
 import '../../../../../core/widgets/glass_card.dart';
 import '../../../domain/entities/hourly_forecast.dart';
@@ -13,10 +14,12 @@ class ForecastChartsCard extends StatefulWidget {
     super.key,
     required this.forecasts,
     this.atmosphere,
+    this.isBengali = false,
   });
 
   final List<HourlyForecast> forecasts;
   final WeatherAtmosphere? atmosphere;
+  final bool isBengali;
 
   @override
   State<ForecastChartsCard> createState() => _ForecastChartsCardState();
@@ -27,6 +30,9 @@ class _ForecastChartsCardState extends State<ForecastChartsCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations(
+        widget.isBengali ? AppLanguage.bengali : AppLanguage.english);
+
     return GlassCard(
       borderRadius: 24,
       padding: const EdgeInsets.all(18),
@@ -49,7 +55,7 @@ class _ForecastChartsCardState extends State<ForecastChartsCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '24-HOUR TRENDS',
+                    l10n.trendsTitle,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.75),
                       fontSize: 12,
@@ -69,14 +75,14 @@ class _ForecastChartsCardState extends State<ForecastChartsCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _TabButton(
-                      label: 'Temp',
+                      label: l10n.tempTab,
                       icon: Icons.thermostat,
                       isSelected: _selectedChart == ChartType.temperature,
                       onTap: () =>
                           setState(() => _selectedChart = ChartType.temperature),
                     ),
                     _TabButton(
-                      label: 'Rain',
+                      label: l10n.rainTab,
                       icon: Icons.water_drop,
                       isSelected: _selectedChart == ChartType.precipitation,
                       onTap: () => setState(
@@ -93,8 +99,14 @@ class _ForecastChartsCardState extends State<ForecastChartsCard> {
             crossFadeState: _selectedChart == ChartType.temperature
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
-            firstChild: TemperatureChart(forecasts: widget.forecasts),
-            secondChild: RainChart(forecasts: widget.forecasts),
+            firstChild: TemperatureChart(
+              forecasts: widget.forecasts,
+              isBengali: widget.isBengali,
+            ),
+            secondChild: RainChart(
+              forecasts: widget.forecasts,
+              isBengali: widget.isBengali,
+            ),
           ),
         ],
       ),
